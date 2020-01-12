@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.g.youtubeparc.R
 import com.g.youtubeparc.model.ItemsItem
-import com.squareup.picasso.Picasso
+import com.g.youtubeparc.utils.loadImage
 
 class PlaylistAdapter(val function: (ItemsItem) -> Unit) : RecyclerView.Adapter<PlaylistAdapter.YouTubeViewHolder>() {
 
@@ -48,12 +48,8 @@ class PlaylistAdapter(val function: (ItemsItem) -> Unit) : RecyclerView.Adapter<
         }
 
         fun bind(item: ItemsItem) {
-            Picasso
-                .get()
-                .load(item.snippet?.thumbnails?.default?.url)
-                .fit()
-                .centerCrop()
-                .into(image)
+            image?.loadImage(item.snippet?.thumbnails?.default?.url)
+
             title?.text = item.snippet.title
             description?.text = item.contentDetails?.itemCount
             itemView.setOnClickListener {
@@ -63,5 +59,5 @@ class PlaylistAdapter(val function: (ItemsItem) -> Unit) : RecyclerView.Adapter<
 
     }
 
-}
 
+}

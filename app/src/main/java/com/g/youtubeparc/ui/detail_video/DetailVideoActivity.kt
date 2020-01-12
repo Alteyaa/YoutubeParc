@@ -1,26 +1,35 @@
 package com.g.youtubeparc.ui.detail_video
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.SparseArray
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import com.g.youtubeparc.R
 import com.g.youtubeparc.adapter.DetailPlaylistAdapter
+import com.g.youtubeparc.adapter.DownloadDialogAdapter
 import com.g.youtubeparc.model.DetailVideoModel
 import com.g.youtubeparc.model.YtVideo
 import com.g.youtubeparc.utils.CallBacks
+import com.g.youtubeparc.utils.DownloadMaster
 import com.g.youtubeparc.utils.PlayerManager
 import com.google.android.exoplayer2.Player
 import kotlinx.android.synthetic.main.activity_detail_playlist.tv_description
 import kotlinx.android.synthetic.main.activity_detail_playlist.tv_title
 import kotlinx.android.synthetic.main.activity_detail_video.*
+
 
 class DetailVideoActivity : AppCompatActivity(), CallBacks.playerCallBack {
 
@@ -30,11 +39,21 @@ class DetailVideoActivity : AppCompatActivity(), CallBacks.playerCallBack {
 
     private var videoId: String? = null
     private var playlistId: String? = null
+    private var writePermission = false
+    private var selectedVideoQuality: String? = null
+    private var selectedVideoExt: String? = null
+    private var fileVideo: YtVideo? = null
+    private var fileName: String? = null
 
     private val ITAG_FOR_AUDIO = 140
 
     private lateinit var player: Player
     private lateinit var playerManager: PlayerManager
+
+    private lateinit var dialogDownloadButton: Button
+    private lateinit var dialogRecyclerView: RecyclerView
+
+    private lateinit var dialogAdapter: DownloadDialogAdapter
 
     private var formatsToShowList: MutableList<YtVideo>? = null
 
@@ -46,8 +65,90 @@ class DetailVideoActivity : AppCompatActivity(), CallBacks.playerCallBack {
         formatsToShowList = ArrayList()
         playerManager = PlayerManager.getSharedInstance(this)
         player = playerManager.playerView.player
+        setupViews()
         getExtra()
         fetchDetailVideo()
+    }
+
+    private fun setupViews() {
+        btn_download.setOnClickListener {
+            checkRequestPermission()
+            showDownloadDialog()
+        }
+    }
+
+    private fun showDownloadDialog() {
+        val builder = AlertDialog.Builder(this, R.style.DownloadDialog)
+
+        val view = layoutInflater.inflate(R.layout.alert_download_dialog, null)
+        builder.setView(view)
+        dialogDownloadButton = view.findViewById(R.id.btn_alert_download)
+        dialogRecyclerView = view.findViewById(R.id.alert_recycler_view)
+
+        initDialogAdapter()
+        dialogAdapter.updateData(formatsToShowList)
+        val alert = builder.create()
+        alert.show()
+        downloadAction(alert)
+
+    }
+
+    private fun downloadAction(builder: AlertDialog) {
+        dialogDownloadButton.setOnClickListener {
+            var downloadName = fileName!!
+            downloadName = downloadName.replace("[\\\\><\"|*?%:#/]".toRegex(), "")
+            var downloadIds = ""
+
+            try {
+                if (fileVideo?.videoFile != null) {
+                    downloadIds += DownloadMaster().downloadFile(
+                        this,
+                        fileVideo?.videoFile!!.url,
+                        downloadName + "." + fileVideo?.videoFile!!.format.ext,
+                        downloadName + "." + fileVideo?.videoFile!!.format.ext
+
+                    )
+                    downloadIds += "-"
+                }
+                if (fileVideo?.audioFile != null) {
+                    downloadIds += DownloadMaster().downloadFile(
+                        this,
+                        fileVideo?.videoFile!!.url,
+                        downloadName + "." + fileVideo?.videoFile!!.format.ext,
+                        downloadName + "." + fileVideo?.videoFile!!.format.ext
+                    )
+                }
+
+            } catch (e: Exception) {
+
+            }
+            builder.dismiss()
+        }
+    }
+
+
+    private fun initDialogAdapter() {
+        dialogAdapter = DownloadDialogAdapter { item: YtVideo -> downloadClickItem(item)}
+        dialogRecyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        dialogRecyclerView.adapter = dialogAdapter
+    }
+
+    private fun downloadClickItem(item: YtVideo) {
+        selectedVideoQuality = item.videoFile?.url
+        selectedVideoExt = item.videoFile?.format?.ext
+        fileVideo = item
+
+    }
+
+
+    private fun checkRequestPermission() {
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),1024)
+        }else{
+            writePermission = true
+        }
     }
 
     private fun getExtra() {
@@ -102,8 +203,8 @@ class DetailVideoActivity : AppCompatActivity(), CallBacks.playerCallBack {
                 })
 
                 val yotutubeUrl =
-                    (formatsToShowList as java.util.ArrayList<YtVideo>)[(formatsToShowList as ArrayList<YtVideo>).lastIndex]
-                playVideo(yotutubeUrl.videoFile!!.url)
+                    (formatsToShowList as java.util.ArrayList<YtVideo>)[(formatsToShowList as ArrayList<YtVideo>).lastIndex -1 ]
+                yotutubeUrl.videoFile?.url?.let { playVideo(it) }
             }
         }.extract(link, true, true)
     }
@@ -149,9 +250,13 @@ class DetailVideoActivity : AppCompatActivity(), CallBacks.playerCallBack {
         super.onConfigurationChanged(newConfig)
         if (newConfig != null) {
             if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
+                player_view.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                player_view.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+
             } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
+                player_view.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
+                player_view.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
             }
         }
     }

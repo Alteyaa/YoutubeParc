@@ -12,8 +12,11 @@ import com.g.youtubeparc.model.DetailPlaylistModel
 import com.g.youtubeparc.model.ItemsItem
 import com.g.youtubeparc.ui.detail_video.DetailVideoActivity
 import kotlinx.android.synthetic.main.activity_detail_playlist.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class DetailPlaylistActivity: AppCompatActivity() {
+class DetailPlaylistActivity : AppCompatActivity() {
 
     private lateinit var viewModel: DetailPlaylistViewModel
     private lateinit var adapter: DetailPlaylistAdapter
@@ -29,7 +32,8 @@ class DetailPlaylistActivity: AppCompatActivity() {
 
         initAdapter()
         getIntentData()
-        subscribeToViewModel()
+        getDetailPlaylistData()
+//        subscribeToViewModel()
     }
 
     private fun getIntentData() {
@@ -40,7 +44,7 @@ class DetailPlaylistActivity: AppCompatActivity() {
 
     private fun initAdapter() {
         recycler_view.layoutManager = LinearLayoutManager(this)
-        adapter = DetailPlaylistAdapter { item: ItemsItem -> click(item) }
+        adapter = DetailPlaylistAdapter {item: ItemsItem -> click(item)}
         recycler_view.adapter = adapter
     }
 
@@ -52,14 +56,43 @@ class DetailPlaylistActivity: AppCompatActivity() {
     }
 
 
-    private fun subscribeToViewModel() {
+    private fun getDetailPlaylistData() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val model = viewModel.getDetailPlaylistData()
+            if (model != null && !model.isNullOrEmpty()) {
+                getExtraDetailPlaylistData(model)
+            } else {
+                subscribeToViewModel()
+            }
+        }
+    }
 
+    private fun getExtraDetailPlaylistData(model: List<DetailPlaylistModel>) {
+        var detailPlaylist: DetailPlaylistModel? = null
+        for (i in 0 until model.size) {
+            for (z in 0 until model[i].items!!.size) {
+                if (model[i].items!![z].snippet.playlistId == id) {
+                    detailPlaylist = model [i]
+                }
+            }
+        }
+
+        if (detailPlaylist != null) updateViews(detailPlaylist)
+        else subscribeToViewModel()
+    }
+
+    private fun subscribeToViewModel() {
         val data = id?.let { viewModel.fetchDetailPlaylistData(it) }
         data?.observe(this, Observer<DetailPlaylistModel> {
             if (data.value != null) {
                 updateViews(data.value!!)
+                updateDatabasePlaylistData(data.value!!)
             }
         })
+    }
+
+    private fun updateDatabasePlaylistData(value: DetailPlaylistModel) {
+        viewModel.insertDetailPlaylistData(value)
     }
 
     private fun updateViews(it: DetailPlaylistModel) {

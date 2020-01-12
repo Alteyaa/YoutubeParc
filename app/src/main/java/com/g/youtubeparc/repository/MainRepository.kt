@@ -7,11 +7,10 @@ import com.g.youtubeparc.api.RetrofitClient
 import com.g.youtubeparc.api.YoutubeApi
 import com.g.youtubeparc.model.DetailPlaylistModel
 import com.g.youtubeparc.model.DetailVideoModel
-import com.g.youtubeparc.model.PlayListModel
+import com.g.youtubeparc.model.PlaylistModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 class MainRepository {
 
 
@@ -23,19 +22,20 @@ class MainRepository {
         val maxResult = "50"
 
         private lateinit var apiService: YoutubeApi
-        fun fetchYoutubePlaylistData(): LiveData<PlayListModel> {
+        fun fetchYoutubePlaylistData(): LiveData<PlaylistModel> {
             apiService = RetrofitClient.create()
-            val data = MutableLiveData<PlayListModel>()
+            val data = MutableLiveData<PlaylistModel>()
 
             apiService.getPlaylists(part, apiKey, channel, maxResult).enqueue(object :
-                Callback<PlayListModel> {
-                override fun onFailure(call: Call<PlayListModel>, t: Throwable) {
+                Callback<PlaylistModel> {
+                override fun onFailure(call: Call<PlaylistModel>, t: Throwable) {
                     data.value = null
+                    Log.v("TAG", t.message)
                 }
 
                 override fun onResponse(
-                    call: Call<PlayListModel>,
-                    response: Response<PlayListModel>
+                    call: Call<PlaylistModel>,
+                    response: Response<PlaylistModel>
                 ) {
                     data.value = response.body()
                 }

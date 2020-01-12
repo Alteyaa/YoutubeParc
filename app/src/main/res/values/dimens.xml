@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <resources>
+        <dimen name="normal_indent">16dp</dimen>
+        <dimen name="high_indent">32dp</dimen>
+        <dimen name="zero_indent">0dp</dimen>
+    </resources>

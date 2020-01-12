@@ -12,8 +12,7 @@
         android:layout_height="200dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
     <androidx.core.widget.NestedScrollView
@@ -34,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/normal_indent"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="@+id/nested_container"
                 app:layout_constraintStart_toStartOf="@+id/nested_container"
@@ -46,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Download video"
+                android:text="@string/download_video"
                 app:layout_constraintStart_toStartOf="@+id/nested_container"
                 app:layout_constraintTop_toBottomOf="@+id/tv_title" />
 

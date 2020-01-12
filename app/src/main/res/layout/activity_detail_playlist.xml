@@ -29,10 +29,8 @@
                 android:layout_marginRight="16dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="56dp"
-                android:text="@string/title"
                 android:textColor="#333333"
                 android:textSize="24sp"
-                android:textAppearance="@style/emotional_w"
                 android:gravity="top"/>
             <TextView
                 android:id="@+id/tv_description"
@@ -45,8 +43,7 @@
                 android:layout_marginBottom="24dp"
                 android:textSize="15sp"
                 android:textColor="#1A1A1A"
-                android:text="@string/description"
-                android:textAppearance="@style/in_this_ser"
+                android:text="description"
                 android:gravity="top"/>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -64,7 +61,6 @@
         android:id="@+id/dt_toolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:tooltipText="@string/title"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:background="@android:color/background_light"
         app:liftOnScroll="false"
