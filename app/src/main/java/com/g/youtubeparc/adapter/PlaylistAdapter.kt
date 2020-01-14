@@ -10,6 +10,7 @@ import com.g.youtubeparc.R
 import com.g.youtubeparc.model.ItemsItem
 import com.g.youtubeparc.utils.loadImage
 
+
 class PlaylistAdapter(val function: (ItemsItem) -> Unit) : RecyclerView.Adapter<PlaylistAdapter.YouTubeViewHolder>() {
 
 

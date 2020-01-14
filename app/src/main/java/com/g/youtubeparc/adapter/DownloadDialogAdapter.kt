@@ -46,7 +46,7 @@ class DownloadDialogAdapter(val function: (YtVideo) -> Unit) :
 
     }
 
-    fun updateData(newList: MutableList<YtVideo>?) {
+    fun updateData(newList: MutableList<YtVideo?>?) {
         list = newList as MutableList<YtVideo>
         notifyDataSetChanged()
     }
@@ -64,6 +64,7 @@ class DownloadDialogAdapter(val function: (YtVideo) -> Unit) :
             }
         }
     }
+
 
 
 }

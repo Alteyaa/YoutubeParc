@@ -2,7 +2,7 @@ package com.g.youtubeparc.api
 
 import com.g.youtubeparc.model.DetailPlaylistModel
 import com.g.youtubeparc.model.DetailVideoModel
-import com.g.youtubeparc.model.PlayListModel
+import com.g.youtubeparc.model.PlaylistModel
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -15,7 +15,7 @@ interface YoutubeApi {
         @Query("key") apiKey: String,
         @Query("channelId") channelId: String,
         @Query("maxResults") maxResults: String
-    ): Call<PlayListModel>
+    ): Call<PlaylistModel>
 
     @GET("youtube/v3/playlistItems")
     fun getDetailPlaylist(

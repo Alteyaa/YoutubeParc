@@ -6,7 +6,6 @@ import com.g.youtubeparc.db.AppDatabase
 
 class App : Application() {
 
-
     companion object {
         lateinit var database: AppDatabase
         lateinit var instance: App

@@ -2,13 +2,15 @@ package com.g.youtubeparc.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.g.youtubeparc.type_converters.ItemsItemTypeConverter
+import com.g.youtubeparc.type_converters.PlaylistModelTypeConverter
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "play_list")
-@TypeConverters(PlayListModelTypeConverter::class)
+
+@TypeConverters(PlaylistModelTypeConverter::class)
+
 data class PlaylistModel(
     @SerializedName("kind")
     var kind: String,

@@ -7,6 +7,7 @@ import androidx.room.Query
 import com.g.youtubeparc.model.DetailPlaylistModel
 import com.g.youtubeparc.model.PlaylistModel
 
+
 @Dao
 interface YoutubeDao {
 
